@@ -9,5 +9,20 @@
                 <button class="btn btn-primary m-1">Post</button>
             </form>
         </div>
+        
+        <div id="posts">
+            {% for post in posts %}
+                <div id="post{{ forloop.counter }}" class="border border-dark rounded p-3 my-3">
+                    <h3>{{ post.title }}</h3>
+                    <a href="#">Edit</a>
+                    <p>{{ post.body }}</p>
+                    <p>
+                        <a>Date: {{ post.date }}</a>
+                        <a>Likes: {{ post.likes.count }}</a>
+                    </p>
+                    <a href="#">Comment</a>
+                </div>
+            {% endfor %}
+        </div>
     </div>
 {% endblock %}
