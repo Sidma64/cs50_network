@@ -13,15 +13,23 @@
         <div id="posts">
             {% for post in posts %}
                 <div id="post{{ forloop.counter }}" class="border border-dark rounded p-3 my-3">
-                    <h3>{{ post.title }}</h3>
-                    <a href="#">Edit</a>
-                    <p>{{ post.body }}</p>
-                    <p>
+                    <p>Posted by <a href="#">{{post.poster}}</a></p>
+                    <p><a href="#">Edit</a></p>
+                    <p class="text-body">{{ post.body }}</p>
+                    <p class="text-secondary">
                         <a>Date: {{ post.date }}</a>
+                        <br>
                         <a>Likes: {{ post.likes.count }}</a>
                     </p>
-                    <a href="#">Comment</a>
+                    <p><a href="#">Comment</a></p>
+
+                    {% for comment in post.comments.all %}
+                        <div id="comment{{ forloop.counter }}" class="border border-gray rounded p-2 my-2">
+
+                        </div>
+                    {% endfor %}
                 </div>
+                
             {% endfor %}
         </div>
     </div>
