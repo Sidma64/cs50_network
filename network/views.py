@@ -8,7 +8,7 @@ from django.contrib.auth.decorators import login_required
 
 from .models import *
 
-
+@login_required
 def index(request):
     posts_all = Post.objects.order_by('-date')
     print(posts_all)
