@@ -4,8 +4,9 @@
     <div class="container-md float-left">
         <div class="border border-dark rounded p-3 my-3">
             <h3>New Post</h3>
-            <form>
-                <textarea class="form-control m-1" id="new-post-body" rows="3"></textarea>
+            <form action="{% url 'post_submit' %}" method="POST">
+                {% csrf_token %}
+                <textarea class="form-control m-1" id="new-post-body" name="body" rows="3"></textarea>
                 <button class="btn btn-primary m-1">Post</button>
             </form>
         </div>

@@ -1,16 +1,17 @@
 from django.contrib.auth import authenticate, login, logout
 from django.db import IntegrityError
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
 from django.core.paginator import Paginator
-
+from django.contrib.auth.decorators import login_required
 
 from .models import *
 
 
 def index(request):
-    posts_all = Post.objects.all()
+    posts_all = Post.objects.order_by('-date')
+    print(posts_all)
     posts_paginated = Paginator(posts_all, 10)
     page_num = 1
     if request.GET.get("page"):
@@ -73,3 +74,12 @@ def register(request):
         return HttpResponseRedirect(reverse("index"))
     else:
         return render(request, "network/register.html")
+
+@login_required
+def post_submit(request):
+    if body := request.POST.get("body"):
+        post = Post(poster=request.user, body=body)
+        post.save()
+        return HttpResponseRedirect(reverse("index"))
+    return HttpResponseBadRequest("You couldn't submit post.")
+        
