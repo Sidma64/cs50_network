@@ -16,15 +16,15 @@
                 <div id="post{{ forloop.counter }}" class="border border-dark rounded p-3 my-3">
                     <p>Posted by <a href="#">{{post.poster}}</a></p>
                     {% if user == post.poster %}
-                        <p><button class="btn btn-primary btn-sm">Edit</button></p>
+                        <p><button class="btn btn-primary btn-sm edit-button" data-id="{{ post.id }}">Edit</button></p>
                     {% endif %}
                     <p class="text-body">{{ post.body }}</p>
                     <p class="text-secondary">
                         <a>Date: {{ post.date }}</a>
                         <br>
-                        <button type="button" class="btn btn-outline-primary">❤️ {{ post.likes.count }}</button>
+                        <button type="button" class="btn btn-outline-primary like-button" data-id="{{ post.id }}">❤️ {{ post.likes.count }}</button>
                     </p>
-                    <p><button type="button" class="btn btn-primary">Comment</button></p>
+                    <p><button type="button" class="btn btn-primary comment-button" data-id="{{ post.id }}">Comment</button></p>
 
                     {% for comment in post.comments.all %}
                         <div id="comment{{ forloop.counter }}" class="border border-gray rounded p-2 my-2">
@@ -37,8 +37,20 @@
         </div>
     </div>
     <script>
-        function like(id) {
+        document.querySelectorAll(".like-button").forEach(function(like_button) {
+            like_button.addEventListener('click', function(event) {
+                like(event.target.dataset.id);
 
+            });
+        });
+
+        function like(id) {
+            fetch(`/post/${id}`, {
+                method: 'POST',
+                body: JSON.stringify({
+                    like: true
+                })
+            });
         }
     </script>
 {% endblock %}
