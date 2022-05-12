@@ -22,9 +22,9 @@
                     <p class="text-secondary">
                         <a>Date: {{ post.date }}</a>
                         <br>
-                        <button class="btn btn-outline-primary">❤️ {{ post.likes.count }}</button>
+                        <button type="button" class="btn btn-outline-primary">❤️ {{ post.likes.count }}</button>
                     </p>
-                    <p><button class="btn btn-primary">Comment</button></p>
+                    <p><button type="button" class="btn btn-primary">Comment</button></p>
 
                     {% for comment in post.comments.all %}
                         <div id="comment{{ forloop.counter }}" class="border border-gray rounded p-2 my-2">
