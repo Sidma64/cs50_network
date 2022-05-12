@@ -15,14 +15,16 @@
             {% for post in posts %}
                 <div id="post{{ forloop.counter }}" class="border border-dark rounded p-3 my-3">
                     <p>Posted by <a href="#">{{post.poster}}</a></p>
-                    <p><a href="#">Edit</a></p>
+                    {% if user == post.poster %}
+                        <p><button class="btn btn-primary btn-sm">Edit</button></p>
+                    {% endif %}
                     <p class="text-body">{{ post.body }}</p>
                     <p class="text-secondary">
                         <a>Date: {{ post.date }}</a>
                         <br>
-                        <a>Likes: {{ post.likes.count }}</a>
+                        <button class="btn btn-outline-primary">❤️ {{ post.likes.count }}</button>
                     </p>
-                    <p><a href="#">Comment</a></p>
+                    <p><button class="btn btn-primary">Comment</button></p>
 
                     {% for comment in post.comments.all %}
                         <div id="comment{{ forloop.counter }}" class="border border-gray rounded p-2 my-2">
@@ -34,4 +36,9 @@
             {% endfor %}
         </div>
     </div>
+    <script>
+        function like(id) {
+
+        }
+    </script>
 {% endblock %}
