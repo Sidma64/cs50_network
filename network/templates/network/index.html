@@ -22,7 +22,7 @@
                     <p class="text-secondary">
                         <a>Date: {{ post.date }}</a>
                         <br>
-                        <button type="button" class="btn btn-outline-primary like-button" data-id="{{ post.id }}">❤️ {{ post.likes.count }}</button>
+                        <button type="button" class="btn btn-outline-primary like-button" data-id="{{ post.id }}" data-liked="false">❤️ <a>{{ post.likes.count }}</a></button>
                     </p>
                     <p><button type="button" class="btn btn-primary comment-button" data-id="{{ post.id }}">Comment</button></p>
 
@@ -37,20 +37,47 @@
         </div>
     </div>
     <script>
-        document.querySelectorAll(".like-button").forEach(function(like_button) {
-            like_button.addEventListener('click', function(event) {
-                like(event.target.dataset.id);
-
-            });
-        });
-
-        function like(id) {
+        function change_like(id, change) {
             fetch(`/post/${id}`, {
                 method: 'POST',
                 body: JSON.stringify({
-                    like: true
+                    like: change
                 })
             });
-        }
+        };
+
+        function add_like_button_event_listener() {
+            document.querySelectorAll(".like-button").forEach(function(like_button) {
+                like_button.addEventListener('click', function(event) {
+                    if (event.target.dataset.liked == "true") {
+                        change_like(event.target.dataset.id, false);
+                        event.target.dataset.liked = "false";
+                    } else {
+                        change_like(event.target.dataset.id, true);
+                        event.target.dataset.liked = "true";
+                    };
+                });
+            });
+        };
+
+        function update_liked() {
+            document.querySelectorAll('.like-button').forEach(function(like_button){
+                id = like_button.dataset.id;
+                fetch(`/post/${id}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.liked) {
+                        like_button.dataset.liked = "true";
+                    } else {
+                        like_button.dataset.liked= "false";
+                    };
+                });
+
+            });
+            
+        };
+        
+        update_liked();
+        add_like_button_event_listener();
     </script>
 {% endblock %}
