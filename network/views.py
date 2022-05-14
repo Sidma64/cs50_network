@@ -21,7 +21,8 @@ def index(request):
     posts_page = posts_paginated.page(page_num)
     
     return render(request, "network/index.html", {
-        "posts": posts_page
+        "posts": posts_page,
+        "user": request.user
     })
 
 
@@ -100,22 +101,14 @@ def post(request, post_id):
                 user.likes.add(post)
             else:
                 user.likes.remove(post)
-            return JsonResponse({"likes": "{post.likes}"}, status=204)
         if  comment := data.get("comment"):
             Comment.objects.create(post=post, commenter=user, body=comment)
-        return HttpResponse(status=204)
 
-    if request.method == "GET":
-        liked = user.likes.filter(pk=post.id).exists()
-        op = user.posts.filter(pk=post.id).exists()
-        return JsonResponse({
-            "liked": liked,
-            "op": op
-        })
-
-    # Post change must be via GET or PUT
-    else:
-        return JsonResponse({
-            "error": "PUT request required."
-        }, status=400)
-        
+    liked = user.likes.filter(pk=post.id).exists()
+    op = user.posts.filter(pk=post.id).exists()
+    likes = post.likes.all().count()
+    return JsonResponse({
+        "liked": liked,
+        "op": op,
+        "likes": likes
+    })

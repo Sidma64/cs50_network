@@ -22,7 +22,11 @@
                     <p class="text-secondary">
                         <a>Date: {{ post.date }}</a>
                         <br>
-                        <button type="button" class="btn btn-outline-primary like-button" data-id="{{ post.id }}" data-liked="false">❤️ <a>{{ post.likes.count }}</a></button>
+                        {% if post in user.likes.all %}
+                            <button type="button" class="btn btn-primary like-button" data-id="{{ post.id }}" data-liked="true">❤️ <a>{{ post.likes.count }}</a></button>
+                        {% else %}
+                            <button type="button" class="btn btn-outline-primary like-button" data-id="{{ post.id }}" data-liked="false">❤️ <a>{{ post.likes.count }}</a></button>
+                        {% endif %}
                     </p>
                     <p><button type="button" class="btn btn-primary comment-button" data-id="{{ post.id }}">Comment</button></p>
 
@@ -37,12 +41,39 @@
         </div>
     </div>
     <script>
+        function liked_appearance(button) {
+            if (button.dataset.liked == "false") {
+                button.dataset.liked= "true";
+                button.children[0].innerHTML = parseInt(button.children[0].innerHTML) + 1
+
+            }
+            list = button.classList;
+            list.remove("btn-outline-primary");
+            list.add("btn-primary");
+        };
+
+        function unliked_appearance(button) {
+            if (button.dataset.liked == "true") {
+                button.dataset.liked= "false";
+                button.children[0].innerHTML = parseInt(button.children[0].innerHTML) - 1
+
+            }
+            list = button.classList;
+            list.remove("btn-primary");
+            list.add("btn-outline-primary");
+        };
+
+
         function change_like(id, change) {
             fetch(`/post/${id}`, {
                 method: 'POST',
                 body: JSON.stringify({
                     like: change
                 })
+            })
+            .then(response => response.json())
+            .then(data => {
+                return data;
             });
         };
 
@@ -51,33 +82,15 @@
                 like_button.addEventListener('click', function(event) {
                     if (event.target.dataset.liked == "true") {
                         change_like(event.target.dataset.id, false);
-                        event.target.dataset.liked = "false";
+                        unliked_appearance(event.target);
                     } else {
                         change_like(event.target.dataset.id, true);
-                        event.target.dataset.liked = "true";
+                        liked_appearance(event.target);
                     };
                 });
             });
         };
 
-        function update_liked() {
-            document.querySelectorAll('.like-button').forEach(function(like_button){
-                id = like_button.dataset.id;
-                fetch(`/post/${id}`)
-                .then(response => response.json())
-                .then(data => {
-                    if (data.liked) {
-                        like_button.dataset.liked = "true";
-                    } else {
-                        like_button.dataset.liked= "false";
-                    };
-                });
-
-            });
-            
-        };
-        
-        update_liked();
         add_like_button_event_listener();
     </script>
 {% endblock %}
