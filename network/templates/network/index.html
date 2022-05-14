@@ -1,95 +1,101 @@
 {% extends "network/layout.html" %}
 
 {% block body %}
-    <div class="container-md float-left">
-        <div class="border border-dark rounded p-3 my-3">
-            <h3>New Post</h3>
-            <form action="{% url 'post_submit' %}" method="POST">
-                {% csrf_token %}
-                <textarea class="form-control m-1" id="new-post-body" name="body" rows="3"></textarea>
-                <button class="btn btn-primary m-1">Post</button>
-            </form>
-        </div>
-        
-        <div id="posts">
-            {% for post in posts %}
-                <div id="post{{ forloop.counter }}" class="border border-dark rounded p-3 my-3">
-                    <p>Posted by <a href="#">{{post.poster}}</a></p>
-                    <p class="text-body">{{ post.body }}</p>
-                    <p class="text-secondary">
-                        <a>Date: {{ post.date }}</a>
-                    </p>
-                    {% if post in user.likes.all %}
-                        <button type="button" class="btn btn-primary like-button" data-id="{{ post.id }}" data-liked="true">❤️ <a>{{ post.likes.count }}</a></button>
-                    {% else %}
-                        <button type="button" class="btn btn-outline-primary like-button" data-id="{{ post.id }}" data-liked="false">❤️ <a>{{ post.likes.count }}</a></button>
-                    {% endif %}
-                    <button type="button" class="btn btn-primary comment-button" data-id="{{ post.id }}">Comment</button>
-                    {% if user == post.poster %}
-                        <button class="btn btn-primary edit-button" data-id="{{ post.id }}">Edit</button>
-                    {% endif %}
 
-                    {% for comment in post.comments.all %}
-                        <div id="comment{{ forloop.counter }}" class="border border-gray rounded p-2 my-2">
-
-                        </div>
-                    {% endfor %}
-                </div>
-                
-            {% endfor %}
-        </div>
+<div class="container-md float-left">
+    {% block top %}
+    <div class="border border-dark rounded p-3 my-3">
+        <h3>New Post</h3>
+        <form action="{% url 'post_submit' %}" method="POST">
+            {% csrf_token %}
+            <textarea class="form-control m-1" id="new-post-body" name="body" rows="3"></textarea>
+            <button class="btn btn-primary m-1">Post</button>
+        </form>
     </div>
-    <script>
-        function liked_appearance(button) {
-            if (button.dataset.liked == "false") {
-                button.dataset.liked= "true";
-                button.children[0].innerHTML = parseInt(button.children[0].innerHTML) + 1
+    {% endblock %}
+    
+    <div id="posts">
+    {% for post in posts %}
+    <div id="post{{ forloop.counter }}" class="border border-dark rounded p-3 my-3">
+        <p>Posted by <a href="{% url 'user_profile' post.poster.username %}">{{post.poster}}</a></p>
+        <p class="text-body">{{ post.body }}</p>
+        <p class="text-secondary">
+            <a>Date: {{ post.date }}</a>
+        </p>
 
-            }
-            list = button.classList;
-            list.remove("btn-outline-primary");
-            list.add("btn-primary");
-        };
+        {% if post in user.likes.all %}
+        <button type="button" class="btn btn-primary like-button" data-id="{{ post.id }}" data-liked="true">❤️ <a>{{ post.likes.count }}</a></button>
+        {% else %}
+        <button type="button" class="btn btn-outline-primary like-button" data-id="{{ post.id }}" data-liked="false">❤️ <a>{{ post.likes.count }}</a></button>
+        {% endif %}
 
-        function unliked_appearance(button) {
-            if (button.dataset.liked == "true") {
-                button.dataset.liked= "false";
-                button.children[0].innerHTML = parseInt(button.children[0].innerHTML) - 1
+        <button type="button" class="btn btn-primary comment-button" data-id="{{ post.id }}">Comment</button>
 
-            }
-            list = button.classList;
-            list.remove("btn-primary");
-            list.add("btn-outline-primary");
-        };
+        {% if user == post.poster %}
+        <button class="btn btn-primary edit-button" data-id="{{ post.id }}">Edit</button>
+        {% endif %}
+
+        {% for comment in post.comments.all %}
+        <div id="comment{{ forloop.counter }}" class="border border-gray rounded p-2 my-2">
+
+        </div>
+        {% endfor %}
+    </div>
+    {% endfor %}
+    </div>
+    
+</div>
+<script>
+    function liked_appearance(button) {
+        if (button.dataset.liked == "false") {
+            button.dataset.liked= "true";
+            button.children[0].innerHTML = parseInt(button.children[0].innerHTML) + 1
+
+        }
+        list = button.classList;
+        list.remove("btn-outline-primary");
+        list.add("btn-primary");
+    };
+
+    function unliked_appearance(button) {
+        if (button.dataset.liked == "true") {
+            button.dataset.liked= "false";
+            button.children[0].innerHTML = parseInt(button.children[0].innerHTML) - 1
+
+        }
+        list = button.classList;
+        list.remove("btn-primary");
+        list.add("btn-outline-primary");
+    };
 
 
-        function change_like(id, change) {
-            fetch(`/post/${id}`, {
-                method: 'POST',
-                body: JSON.stringify({
-                    like: change
-                })
+    function change_like(id, change) {
+        fetch(`/post/${id}`, {
+            method: 'POST',
+            body: JSON.stringify({
+                like: change
             })
-            .then(response => response.json())
-            .then(data => {
-                return data;
-            });
-        };
+        })
+        .then(response => response.json())
+        .then(data => {
+            return data;
+        });
+    };
 
-        function add_like_button_event_listener() {
-            document.querySelectorAll(".like-button").forEach(function(like_button) {
-                like_button.addEventListener('click', function(event) {
-                    if (event.target.dataset.liked == "true") {
-                        change_like(event.target.dataset.id, false);
-                        unliked_appearance(event.target);
-                    } else {
-                        change_like(event.target.dataset.id, true);
-                        liked_appearance(event.target);
-                    };
-                });
+    function add_like_button_event_listener() {
+        document.querySelectorAll(".like-button").forEach(function(like_button) {
+            like_button.addEventListener('click', function(event) {
+                if (event.target.dataset.liked == "true") {
+                    change_like(event.target.dataset.id, false);
+                    unliked_appearance(event.target);
+                } else {
+                    change_like(event.target.dataset.id, true);
+                    liked_appearance(event.target);
+                };
             });
-        };
+        });
+    };
 
-        add_like_button_event_listener();
-    </script>
+    add_like_button_event_listener();
+</script>
 {% endblock %}

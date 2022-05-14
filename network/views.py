@@ -112,3 +112,22 @@ def post(request, post_id):
         "op": op,
         "likes": likes
     })
+
+def user_profile(request, username):
+    user = request.user
+    q_user = User.objects.get(username=username)
+    print(q_user)
+
+    posts_all = Post.objects.filter(poster=q_user).order_by('-date')
+    posts_paginated = Paginator(posts_all, 10)
+    page_num = 1
+    if request.GET.get("page"):
+        page_num = request.GET["page"]
+
+    posts_page = posts_paginated.page(page_num)
+    if request.method == "GET":
+        return render(request, "network/profile.html", {
+            "posts": posts_page,
+            "user": request.user,
+            "q_user": q_user
+        })

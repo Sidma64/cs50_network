@@ -1,0 +1,8 @@
+{% extends "network/index.html" %}
+
+
+{% block top %}
+<h2>{{ q_user.username }}</h2>
+<button class="btn btn-outline-primary">Follow</button>
+<p><b>ID:</b>{{ q_user.id }}</p>
+{% endblock %}
