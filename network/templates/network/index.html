@@ -15,20 +15,19 @@
             {% for post in posts %}
                 <div id="post{{ forloop.counter }}" class="border border-dark rounded p-3 my-3">
                     <p>Posted by <a href="#">{{post.poster}}</a></p>
-                    {% if user == post.poster %}
-                        <p><button class="btn btn-primary btn-sm edit-button" data-id="{{ post.id }}">Edit</button></p>
-                    {% endif %}
                     <p class="text-body">{{ post.body }}</p>
                     <p class="text-secondary">
                         <a>Date: {{ post.date }}</a>
-                        <br>
-                        {% if post in user.likes.all %}
-                            <button type="button" class="btn btn-primary like-button" data-id="{{ post.id }}" data-liked="true">❤️ <a>{{ post.likes.count }}</a></button>
-                        {% else %}
-                            <button type="button" class="btn btn-outline-primary like-button" data-id="{{ post.id }}" data-liked="false">❤️ <a>{{ post.likes.count }}</a></button>
-                        {% endif %}
                     </p>
-                    <p><button type="button" class="btn btn-primary comment-button" data-id="{{ post.id }}">Comment</button></p>
+                    {% if post in user.likes.all %}
+                        <button type="button" class="btn btn-primary like-button" data-id="{{ post.id }}" data-liked="true">❤️ <a>{{ post.likes.count }}</a></button>
+                    {% else %}
+                        <button type="button" class="btn btn-outline-primary like-button" data-id="{{ post.id }}" data-liked="false">❤️ <a>{{ post.likes.count }}</a></button>
+                    {% endif %}
+                    <button type="button" class="btn btn-primary comment-button" data-id="{{ post.id }}">Comment</button>
+                    {% if user == post.poster %}
+                        <button class="btn btn-primary edit-button" data-id="{{ post.id }}">Edit</button>
+                    {% endif %}
 
                     {% for comment in post.comments.all %}
                         <div id="comment{{ forloop.counter }}" class="border border-gray rounded p-2 my-2">
