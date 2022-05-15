@@ -15,34 +15,59 @@
     {% endblock %}
     
     <div id="posts">
-    {% for post in posts %}
-    <div id="post{{ forloop.counter }}" class="border border-dark rounded p-3 my-3">
-        <p>Posted by <a href="{% url 'user_profile' post.poster.username %}">{{post.poster}}</a></p>
-        <p class="text-body">{{ post.body }}</p>
-        <p class="text-secondary">
-            <a>Date: {{ post.date }}</a>
-        </p>
+        {% for post in posts %}
+        <div id="post{{ forloop.counter }}" class="border border-dark rounded p-3 my-3">
+            <p class="text-secondary">Posted by <a href="{% url 'user_profile' post.poster.username %}">{{post.poster}}</a></p>
+            <p class="text-body">{{ post.body }}</p>
+            <p class="text-secondary">
+                <a>Date: {{ post.date }}</a>
+            </p>
 
-        {% if post in user.likes.all %}
-        <button type="button" class="btn btn-primary like-button" data-id="{{ post.id }}" data-liked="true">❤️ <a>{{ post.likes.count }}</a></button>
-        {% else %}
-        <button type="button" class="btn btn-outline-primary like-button" data-id="{{ post.id }}" data-liked="false">❤️ <a>{{ post.likes.count }}</a></button>
-        {% endif %}
+            {% if post in user.likes.all %}
+            <button type="button" class="btn btn-primary like-button" data-id="{{ post.id }}" data-liked="true">❤️ <a>{{ post.likes.count }}</a></button>
+            {% else %}
+            <button type="button" class="btn btn-outline-primary like-button" data-id="{{ post.id }}" data-liked="false">❤️ <span>{{ post.likes.count }}</span></button>
+            {% endif %}
 
-        <button type="button" class="btn btn-primary comment-button" data-id="{{ post.id }}">Comment</button>
+            <button type="button" class="btn btn-primary comment-button" data-id="{{ post.id }}">Comment</button>
 
-        {% if user == post.poster %}
-        <button class="btn btn-primary edit-button" data-id="{{ post.id }}">Edit</button>
-        {% endif %}
+            {% if user == post.poster %}
+            <button class="btn btn-primary edit-button" data-id="{{ post.id }}">Edit</button>
+            {% endif %}
 
-        {% for comment in post.comments.all %}
-        <div id="comment{{ forloop.counter }}" class="border border-gray rounded p-2 my-2">
+            {% for comment in post.comments.all %}
+            <div id="comment{{ forloop.counter }}" class="border border-gray rounded p-2 my-2">
 
+            </div>
+            {% endfor %}
         </div>
         {% endfor %}
     </div>
-    {% endfor %}
-    </div>
+    {% if posts.has_other_pages %}
+    <nav aria-label="Page navigation example">
+        <ul class="pagination">
+            {% if posts.has_previous %}
+            <li class="page-item">
+                <a class="page-link" href="?page=1" aria-label="Previous">
+                    <span aria-hidden="true">&laquo;</span>
+                </a>
+            </li>
+            {% endif %}
+
+            {% for page_num in posts.paginator.page_range %}
+            <li class="page-item {% if page_num is posts.number %}active{% endif %}"><a class="page-link" href="?page={{ page_num }}">{{ page_num }}</a></li>
+            {% endfor %}
+
+            {% if posts.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ posts.paginator.num_pages }}" aria-label="Next">
+                    <span aria-hidden="true">&raquo;</span>
+                </a>
+            </li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% endif %}
     
 </div>
 <script>
