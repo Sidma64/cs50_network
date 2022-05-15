@@ -5,6 +5,7 @@ from django.db import models
 
 class User(AbstractUser):
     pass
+    followings = models.ManyToManyField("self", symmetrical=True, related_name="followers", null=True, blank=True)
 
 class Post(models.Model):
     body = models.CharField(max_length=512)
