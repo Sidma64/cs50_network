@@ -144,3 +144,21 @@ def unfollow(request, username):
     q_user = User.objects.get(username=username)
     user.followings.remove(q_user)
     return HttpResponseNotModified()
+
+@csrf_exempt
+@login_required
+def following(request):
+    user = request.user
+
+    posts_all = Post.objects.filter(poster__in=user.followings.all()).order_by('-date')
+    posts_paginated = Paginator(posts_all, 10)
+    page_num = 1
+    if request.GET.get("page"):
+        page_num = request.GET["page"]
+
+    posts_page = posts_paginated.page(page_num)
+    if request.method == "GET":
+        return render(request, "network/index.html", {
+            "posts": posts_page,
+            "user": request.user
+        })
