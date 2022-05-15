@@ -1,7 +1,7 @@
 import json
 from django.contrib.auth import authenticate, login, logout
 from django.db import IntegrityError
-from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseRedirect, JsonResponse
+from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseRedirect, JsonResponse, HttpResponseNotModified
 from django.shortcuts import render
 from django.urls import reverse
 from django.core.paginator import Paginator
@@ -113,6 +113,8 @@ def post(request, post_id):
         "likes": likes
     })
 
+@csrf_exempt
+@login_required
 def user_profile(request, username):
     user = request.user
     q_user = User.objects.get(username=username)
@@ -130,3 +132,15 @@ def user_profile(request, username):
             "user": request.user,
             "q_user": q_user
         })
+
+def follow(request, username):
+    user = request.user
+    q_user = User.objects.get(username=username)
+    user.followings.add(q_user)
+    return HttpResponseNotModified()
+
+def unfollow(request, username):
+    user = request.user
+    q_user = User.objects.get(username=username)
+    user.followings.remove(q_user)
+    return HttpResponseNotModified()

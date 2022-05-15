@@ -3,6 +3,41 @@
 
 {% block top %}
 <h2>{{ q_user.username }}</h2>
-<button class="btn btn-outline-primary">Follow</button>
+<button id="follow-button" data-followed="{% if q_user in user.followings.all %}true{% else %}false{% endif %}">Follow</button>
 <p><b>ID:</b>{{ q_user.id }}</p>
+<script>
+    function follow_button_view() {
+        if (document.querySelector("#follow-button").dataset.followed == "true") {
+            document.querySelector("#follow-button").setAttribute('class', 'btn btn-primary');
+            follow();
+        } else {
+            document.querySelector("#follow-button").setAttribute('class', 'btn btn-outline-primary');
+            follow();
+        };
+    };
+
+    function follow() {
+        document.querySelector("#follow-button").addEventListener('click', function(event) {
+            if (event.target.dataset.followed == "true") {
+                fetch("{% url 'unfollow' q_user.username %}")
+                .then(response => {
+                    if (response.status == "304") {
+                        document.querySelector("#follow-button").dataset.followed = "false";
+                        follow_button_view();
+                    };
+                });
+            } else {
+                fetch("{% url 'follow' q_user.username %}")
+                .then(response => {
+                    if (response.status == "304") {
+                        document.querySelector("#follow-button").dataset.followed = "true";
+                        follow_button_view();
+                    };
+                });
+            };
+        });
+    };
+
+    follow_button_view()
+</script>
 {% endblock %}
